@@ -35,9 +35,6 @@ class ChatbotFSM:
             'total_price': 0
         }
         
-        # Harga tiket
-        self.ticket_price = 50000
-        
         # Daftar kursi yang tersedia
         self.available_seats = self._generate_seats()
     
@@ -180,8 +177,9 @@ class ChatbotFSM:
                 if seat in self.available_seats:
                     self.available_seats.remove(seat)
             
-            # Hitung total harga
-            self.order_data['total_price'] = self.order_data['ticket_count'] * self.ticket_price
+            # Hitung total harga berdasarkan harga film yang dipilih
+            harga_film = self.nlp_engine.get_price(self.order_data['movie_name'])
+            self.order_data['total_price'] = self.order_data['ticket_count'] * harga_film
             
             # Lanjut ke konfirmasi
             self.current_state = State.KONFIRMASI
@@ -242,8 +240,11 @@ class ChatbotFSM:
         return "🚫 Pesanan dibatalkan.\n\n" + self.nlp_engine.print_menu()
     
     def _show_movies(self) -> str:
-        """Tampilkan daftar film yang tersedia"""
-        movies_list = "\n".join([f"  • {movie}" for movie in self.nlp_engine.movies])
+        """Tampilkan daftar film yang tersedia beserta harga"""
+        movies_list = "\n".join([
+            f"  • {name} — Rp {price:,}"
+            for name, price in self.nlp_engine.movie_catalog.items()
+        ])
         return f"📽️ **Daftar Film yang Tersedia:**\n{movies_list}\n\n⏰ Jam tayang: 10:00, 13:00, 16:00, 19:00, 22:00"
     
     def _show_seat_selection(self) -> str:
@@ -256,8 +257,9 @@ class ChatbotFSM:
             available_row = [f"[{seat}]" if seat in self.available_seats else f"[X]" for seat in row_seats]
             seat_grid += f"  {row}  {' '.join(available_row)}\n"
         
-        estimasi_total = self.order_data['ticket_count'] * self.ticket_price
-        return f"🎫 **Pemilihan Kursi**\n\nFilm: {self.order_data['movie_name']}\nJam: {self.order_data['show_time']}\nJumlah tiket: {self.order_data['ticket_count']}\nHarga per tiket: Rp {self.ticket_price:,}\nEstimasi Total: Rp {estimasi_total:,}\n\nLayout Kursi:\n{seat_grid}\n[Kursi] = Tersedia, [X] = Terpesan\n\nKetik kursi yang dipilih (contoh: 'pilih kursi A1, A2')"
+        harga_film = self.nlp_engine.get_price(self.order_data['movie_name'])
+        estimasi_total = self.order_data['ticket_count'] * harga_film
+        return f"🎫 **Pemilihan Kursi**\n\nFilm: {self.order_data['movie_name']}\nJam: {self.order_data['show_time']}\nJumlah tiket: {self.order_data['ticket_count']}\nHarga per tiket: Rp {harga_film:,}\nEstimasi Total: Rp {estimasi_total:,}\n\nLayout Kursi:\n{seat_grid}\n[Kursi] = Tersedia, [X] = Terpesan\n\nKetik kursi yang dipilih (contoh: 'pilih kursi A1, A2')"
     
     def _show_confirmation(self) -> str:
         """Tampilkan konfirmasi pesanan"""

@@ -9,8 +9,15 @@ class NLPEngine:
     """
     
     def __init__(self):
-        # Daftar film yang tersedia
-        self.movies = ["Avenger", "Batman", "Spiderman", "Joker"]
+        # Katalog film beserta harga tiket (nama: harga)
+        self.movie_catalog = {
+            "Avenger":   85000,
+            "Batman":    75000,
+            "Spiderman": 80000,
+            "Joker":     70000,
+        }
+        # Daftar nama film (untuk kompatibilitas kode lama)
+        self.movies = list(self.movie_catalog.keys())
         
         # Pattern regex untuk mendeteksi berbagai entitas
         self.patterns = {
@@ -142,15 +149,24 @@ class NLPEngine:
 5. **Batal** - Ketik "batal" untuk membatalkan pesanan
 
 📽️ **Film yang Tersedia:**
-- Avenger
-- Batman
-- Spiderman
-- Joker
+""" + "\n".join([f"- {name} — Rp {price:,}" for name, price in self.movie_catalog.items()]) + """
 
 ⏰ **Jam Tayang:**
 - 10:00, 13:00, 16:00, 19:00, 22:00
         """
         return menu
+    
+    def get_price(self, movie_name: str) -> int:
+        """
+        Mengembalikan harga tiket untuk film tertentu.
+        
+        Args:
+            movie_name: Nama film
+            
+        Returns:
+            Harga tiket dalam rupiah, 0 jika film tidak ditemukan
+        """
+        return self.movie_catalog.get(movie_name, 0)
     
     def validate_movie(self, movie_name: str) -> bool:
         """
@@ -162,7 +178,7 @@ class NLPEngine:
         Returns:
             True jika film valid, False jika tidak
         """
-        return movie_name in self.movies
+        return movie_name in self.movie_catalog
     
     def validate_time(self, time_str: str) -> bool:
         """
