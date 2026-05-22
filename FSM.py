@@ -256,7 +256,8 @@ class ChatbotFSM:
             available_row = [f"[{seat}]" if seat in self.available_seats else f"[X]" for seat in row_seats]
             seat_grid += f"  {row}  {' '.join(available_row)}\n"
         
-        return f"🎫 **Pemilihan Kursi**\n\nJumlah tiket: {self.order_data['ticket_count']}\nFilm: {self.order_data['movie_name']}\nJam: {self.order_data['show_time']}\n\nLayout Kursi:\n{seat_grid}\n[Kursi] = Tersedia, [X] = Terpesan\n\nKetik kursi yang dipilih (contoh: 'pilih kursi A1, A2')"
+        estimasi_total = self.order_data['ticket_count'] * self.ticket_price
+        return f"🎫 **Pemilihan Kursi**\n\nFilm: {self.order_data['movie_name']}\nJam: {self.order_data['show_time']}\nJumlah tiket: {self.order_data['ticket_count']}\nHarga per tiket: Rp {self.ticket_price:,}\nEstimasi Total: Rp {estimasi_total:,}\n\nLayout Kursi:\n{seat_grid}\n[Kursi] = Tersedia, [X] = Terpesan\n\nKetik kursi yang dipilih (contoh: 'pilih kursi A1, A2')"
     
     def _show_confirmation(self) -> str:
         """Tampilkan konfirmasi pesanan"""

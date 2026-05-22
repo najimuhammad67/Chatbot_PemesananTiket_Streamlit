@@ -198,8 +198,9 @@ def display_input_area():
 
 def display_sidebar():
     """Tampilkan sidebar dengan informasi tambahan"""
-    # Baca film dari engine agar selalu sinkron
+    # Baca data dari engine dan FSM agar selalu sinkron
     nlp = NLPEngine()
+    ticket_price = st.session_state.chatbot.ticket_price
     
     with st.sidebar:
         st.markdown("### 📋 Informasi")
@@ -214,7 +215,7 @@ def display_sidebar():
             st.markdown(f"- {time}")
         
         st.markdown("#### Harga Tiket")
-        st.markdown("Rp 50.000 per tiket")
+        st.markdown(f"Rp {ticket_price:,} per tiket")
         
         st.markdown("---")
         st.markdown("### 💡 Tips")
